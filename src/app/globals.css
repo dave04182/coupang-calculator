@@ -1,0 +1,61 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --text-faint: #9ca3af;
+  --nav-bg: #ffffff;
+  --hover: #f3f4f6;
+  --active-bg: #fff5f5;
+  --red: #f04141;
+  --green: #22c55e;
+  --blue: #6366f1;
+}
+
+:root.dark {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --border: #2d3148;
+  --text: #f0f0f0;
+  --text-muted: #9ca3af;
+  --text-faint: #6b7280;
+  --nav-bg: #13151f;
+  --hover: #252839;
+  --active-bg: #2d1f1f;
+  --red: #f87171;
+  --green: #4ade80;
+  --blue: #818cf8;
+}
+
+body {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+input, select, button, textarea { font-family: inherit; color: inherit; }
+
+:root.dark input,
+:root.dark select,
+:root.dark textarea {
+  background: #252839;
+  border-color: #2d3148 !important;
+  color: #f0f0f0;
+}
+:root.dark input::placeholder { color: #555; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+:root.dark ::-webkit-scrollbar-thumb { background: #374151; }
+
+@media (max-width: 640px) {
+  .dashboard, .analytics-page, .products-page, .settlement-page, .settings-page {
+    padding: 1rem 0.75rem !important;
+  }
+}
