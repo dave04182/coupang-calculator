@@ -18,13 +18,15 @@ function SingleCalculator() {
 
   const commissionRate = customRate ?? (CATEGORY_FEES.find(c => c.id === categoryId)?.rate ?? 11);
   const result: ProfitResult | null = sellingPrice > 0
-    ? calculateProfit(sellingPrice, purchasePrice, packagingCost, commissionRate, settings)
+    ? calculateProfit(sellingPrice, purchasePrice, packagingCost, commissionRate, {
+      ...settings,
+      credentials: { accessKey: '', secretKey: '', vendorId: '' },
+    })
     : null;
-
   const marginColor = !result ? '#888'
     : result.marginRate >= 20 ? '#22c55e'
-    : result.marginRate >= 10 ? '#f59e0b'
-    : '#f04141';
+      : result.marginRate >= 10 ? '#f59e0b'
+        : '#f04141';
 
   const pieData = result ? [
     { name: '원가', value: result.productCost, color: '#6366f1' },

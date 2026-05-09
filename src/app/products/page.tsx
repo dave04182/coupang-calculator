@@ -20,13 +20,16 @@ function ProductRow({ product, item }: { product: CoupangProduct; item: CoupangP
 
   const commissionRate = CATEGORY_FEES.find(c => c.id === categoryId)?.rate ?? 11;
   const result = item.salePrice > 0 && purchasePrice > 0
-    ? calculateProfit(item.salePrice, purchasePrice, packagingCost, commissionRate, settings)
+    ? calculateProfit(item.salePrice, purchasePrice, packagingCost, commissionRate, {
+      ...settings,
+      credentials: { accessKey: '', secretKey: '', vendorId: '' },
+    })
     : null;
 
   const marginColor = !result ? '#999'
     : result.marginRate >= 20 ? '#16a34a'
-    : result.marginRate >= 10 ? '#d97706'
-    : '#dc2626';
+      : result.marginRate >= 10 ? '#d97706'
+        : '#dc2626';
 
   const handleSave = () => {
     setCost(id, {
