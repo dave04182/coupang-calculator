@@ -53,10 +53,11 @@ export async function DELETE() {
 // GET: 연동 상태 확인 (키 값은 노출하지 않음)
 export async function GET(req: NextRequest) {
   const vendorId = req.cookies.get('coupang_vendor_id')?.value;
+  const testMode = req.cookies.get('test_mode')?.value === 'true';
   const hasKey = !!(
     req.cookies.get('coupang_access_key')?.value &&
     req.cookies.get('coupang_secret_key')?.value &&
     vendorId
   );
-  return NextResponse.json({ configured: hasKey, vendorId: vendorId ?? null });
+  return NextResponse.json({ configured: hasKey || testMode, vendorId: vendorId ?? null, testMode });
 }

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchOrders } from '@/lib/coupang-api';
 import { getCredentialsFromRequest } from '@/lib/auth';
+import { MOCK_ORDERS } from '@/lib/mockData';
 
 export async function GET(req: NextRequest) {
+  const testMode = req.cookies.get('test_mode')?.value === 'true';
+  if (testMode) return NextResponse.json(MOCK_ORDERS);
+
   const creds = getCredentialsFromRequest(req);
-  if (!creds) {
-    return NextResponse.json({ error: 'API 키가 설정되지 않았습니다.' }, { status: 401 });
-  }
+  if (!creds) return NextResponse.json({ error: 'API 키가 설정되지 않았습니다.' }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const from = searchParams.get('from') ?? new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 19);

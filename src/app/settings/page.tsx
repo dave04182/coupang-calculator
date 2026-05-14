@@ -27,11 +27,13 @@ export default function SettingsPage() {
   const [keyError, setKeyError] = useState('');
   const [form, setForm] = useState<SafeSettings>(settings);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  const [testMode, setTestMode] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth').then(r => r.json()).then(d => {
       setConfigured(d.configured);
       if (d.vendorId) setVendorId(d.vendorId);
+      if (d.testMode) setTestMode(true);
     });
   }, [setConfigured]);
 
@@ -67,6 +69,17 @@ export default function SettingsPage() {
     setTimeout(() => { setSettingsSaved(false); router.push('/dashboard'); }, 900);
   };
 
+  const toggleTestMode = async () => {
+    const next = !testMode;
+    await fetch('/api/test-mode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enable: next })
+    });
+    setTestMode(next);
+    setConfigured(next);
+  };
+
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="section">
       <div className="section-title">
@@ -84,6 +97,16 @@ export default function SettingsPage() {
         <div className="page-sub">API 키는 서버에만 저장되며 브라우저에 노출되지 않습니다</div>
       </div>
 
+      <div className="test-mode-banner">
+        <div>
+          <div className="test-mode-title">🧪 테스트 모드</div>
+          <div className="test-mode-sub">가짜 데이터로 모든 기능을 미리 체험할 수 있습니다</div>
+        </div>
+        <button className={`toggle ${testMode ? 'on' : ''}`} onClick={toggleTestMode}>
+          <span className="toggle-thumb" />
+        </button>
+      </div>
+
       <Section title="쿠팡 API 키 연동">
         <div className="guide">
           <div className="guide-steps">
@@ -95,7 +118,7 @@ export default function SettingsPage() {
           <div className="guide-warn">⚠ API 키 유효기간 <strong>180일</strong> — 만료 전 재발급 필요</div>
         </div>
 
-        {isConfigured && (
+        {isConfigured && !testMode && (
           <div className="connected-badge">
             <span className="badge-dot" />
             <span>연동됨{vendorId ? ` · ${vendorId}` : ''}</span>
@@ -124,7 +147,7 @@ export default function SettingsPage() {
           <button className={`connect-btn ${keyStatus}`} onClick={handleSaveKeys} disabled={keyStatus === 'saving'}>
             {keyStatus === 'saving' ? '검증 중...' : keyStatus === 'ok' ? '✅ 연동 완료' : isConfigured ? '키 업데이트' : '연동하기'}
           </button>
-          {isConfigured && <button className="disconnect-btn" onClick={handleDisconnect}>연동 해제</button>}
+          {isConfigured && !testMode && <button className="disconnect-btn" onClick={handleDisconnect}>연동 해제</button>}
         </div>
       </Section>
 
@@ -216,16 +239,24 @@ export default function SettingsPage() {
         .page-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
         .page-sub { font-size: 0.82rem; color: var(--text-muted); }
 
-        /* 여백(margin-bottom)을 1.2rem -> 2.5rem으로 늘려 구분을 명확히 했습니다 */
+        .test-mode-banner { display: flex; align-items: center; justify-content: space-between;
+          background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+          border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
+        .test-mode-title { font-size: 0.9rem; font-weight: 700; color: var(--blue); margin-bottom: 0.2rem; }
+        .test-mode-sub { font-size: 0.78rem; color: var(--text-muted); }
+        .toggle { width: 44px; height: 24px; border-radius: 12px; border: none;
+          background: var(--border2); cursor: pointer; position: relative;
+          transition: background 0.2s; flex-shrink: 0; padding: 0; }
+        .toggle.on { background: var(--accent); }
+        .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+          border-radius: 50%; background: white; transition: transform 0.2s; display: block; }
+        .toggle.on .toggle-thumb { transform: translateX(20px); }
+
         .section { background: var(--surface); border: 1px solid var(--border);
-          border-radius: 14px; padding: 1.6rem; margin-bottom: 2.5rem; } 
-        
-        /* 폰트 크기와 두께를 키우고, 바(bar)와의 간격도 살짝 넓혀 가독성을 높였습니다 */
+          border-radius: 14px; padding: 1.6rem; margin-bottom: 2.5rem; }
         .section-title { display: flex; align-items: center; gap: 0.6rem;
           font-size: 1.15rem; font-weight: 800; color: var(--text);
           margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-        
-        /* 소제목 텍스트가 커진 만큼 장식용 바의 크기도 비례하게 키웠습니다 */
         .section-bar { display: inline-block; width: 4px; height: 18px;
           background: var(--accent); border-radius: 2px; flex-shrink: 0; }
 
