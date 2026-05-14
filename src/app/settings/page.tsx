@@ -216,12 +216,17 @@ export default function SettingsPage() {
         .page-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
         .page-sub { font-size: 0.82rem; color: var(--text-muted); }
 
+        /* 여백(margin-bottom)을 1.2rem -> 2.5rem으로 늘려 구분을 명확히 했습니다 */
         .section { background: var(--surface); border: 1px solid var(--border);
-          border-radius: 14px; padding: 1.6rem; margin-bottom: 1.2rem; }
-        .section-title { display: flex; align-items: center; gap: 0.5rem;
-          font-size: 0.95rem; font-weight: 700; color: var(--text);
-          margin-bottom: 1.4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-        .section-bar { display: inline-block; width: 3px; height: 16px;
+          border-radius: 14px; padding: 1.6rem; margin-bottom: 2.5rem; } 
+        
+        /* 폰트 크기와 두께를 키우고, 바(bar)와의 간격도 살짝 넓혀 가독성을 높였습니다 */
+        .section-title { display: flex; align-items: center; gap: 0.6rem;
+          font-size: 1.15rem; font-weight: 800; color: var(--text);
+          margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        
+        /* 소제목 텍스트가 커진 만큼 장식용 바의 크기도 비례하게 키웠습니다 */
+        .section-bar { display: inline-block; width: 4px; height: 18px;
           background: var(--accent); border-radius: 2px; flex-shrink: 0; }
 
         .guide { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem; }
