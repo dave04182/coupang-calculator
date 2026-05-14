@@ -165,7 +165,10 @@ export default function ProductsPage() {
         const cost = costs[id];
         const commissionRate = CATEGORY_FEES.find(c => c.id === p.categoryId)?.rate ?? 11;
         const result = cost && item.salePrice > 0
-          ? calculateProfit(item.salePrice, cost.purchasePrice, cost.packagingCost, commissionRate, settings)
+          ? calculateProfit(item.salePrice, cost.purchasePrice, cost.packagingCost, commissionRate, {
+            ...settings,
+            credentials: { accessKey: '', secretKey: '', vendorId: '' },
+          })
           : null;
         return {
           vendorItemId: id,

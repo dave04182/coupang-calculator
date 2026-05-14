@@ -19,14 +19,15 @@ function SingleCalculator() {
   const commissionRate = customRate ?? (CATEGORY_FEES.find(c => c.id === categoryId)?.rate ?? 11);
   const result: ProfitResult | null = sellingPrice > 0
     ? calculateProfit(sellingPrice, purchasePrice, packagingCost, commissionRate, {
-      ...settings,
-      credentials: { accessKey: '', secretKey: '', vendorId: '' },
-    })
+        ...settings,
+        credentials: { accessKey: '', secretKey: '', vendorId: '' },
+      })
     : null;
+
   const marginColor = !result ? '#888'
     : result.marginRate >= 20 ? '#22c55e'
-      : result.marginRate >= 10 ? '#f59e0b'
-        : '#f04141';
+    : result.marginRate >= 10 ? '#f59e0b'
+    : '#f04141';
 
   const pieData = result ? [
     { name: '원가', value: result.productCost, color: '#6366f1' },
@@ -73,7 +74,6 @@ function SingleCalculator() {
 
       {result && (
         <div className="result-section">
-          {/* 메인 결과 카드 */}
           <div className="result-cards">
             <div className="result-card main">
               <span className="label">순수익</span>
@@ -93,7 +93,6 @@ function SingleCalculator() {
             </div>
           </div>
 
-          {/* 비용 구조 */}
           <div className="cost-breakdown">
             <h3>비용 구조</h3>
             <div className="breakdown-row"><span>판매가</span><span>{formatWon(result.sellingPrice)}</span></div>
@@ -105,7 +104,6 @@ function SingleCalculator() {
             <div className="breakdown-row total"><span>순수익</span><span style={{ color: marginColor }}>{formatWon(result.netProfit)}</span></div>
           </div>
 
-          {/* 파이차트 */}
           {pieData.length > 0 && (
             <div className="pie-wrap">
               <ResponsiveContainer width="100%" height={200}>
@@ -126,7 +124,7 @@ function SingleCalculator() {
 
 // ─── 환불 실시간 패널 ─────────────────────────────────────────
 function ReturnMonitor() {
-  const { settings, isConfigured } = useSettingsStore();
+  const { settings, isConfigured, setConfigured } = useSettingsStore();
   const { summary, isLoading, lastPolledAt, setSummary, setLoading, setLastPolledAt } = useDashboardStore();
   const [notification, setNotification] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -138,13 +136,11 @@ function ReturnMonitor() {
       const from = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 19);
       const to = new Date().toISOString().slice(0, 19);
 
-      // 쿠키는 자동으로 전송됨 — URL에 API 키 노출 없음
       const [ordersRes, returnsRes] = await Promise.all([
         fetch(`/api/orders?from=${from}&to=${to}`),
         fetch(`/api/returns?from=${from}&to=${to}`),
       ]);
 
-      // 401이면 키 만료
       if (ordersRes.status === 401) {
         setConfigured(false);
         return;
@@ -189,9 +185,8 @@ function ReturnMonitor() {
     } finally {
       setLoading(false);
     }
-  }, [isConfigured, summary, setSummary, setLoading, setLastPolledAt]);
+  }, [isConfigured, setConfigured, summary, setSummary, setLoading, setLastPolledAt]);
 
-  // 폴링 설정
   useEffect(() => {
     if (!isConfigured) return;
     poll();
@@ -261,10 +256,9 @@ function ReturnMonitor() {
 // ─── 대시보드 메인 ────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter();
-  const { isConfigured, setConfigured } = useSettingsStore();
+  const { settings, isConfigured, setConfigured } = useSettingsStore();
   const { summaries } = useProductProfitStore();
 
-  // 페이지 진입 시 쿠키 기반 인증 상태 확인
   useEffect(() => {
     fetch('/api/auth')
       .then(r => r.json())
@@ -288,7 +282,6 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 상품 수익 요약 배너 */}
       {filledSummaries.length > 0 && (
         <div className="profit-banner">
           <div className="banner-item">
@@ -322,7 +315,6 @@ export default function DashboardPage() {
         h1 { font-size: 1.3rem; font-weight: 700; }
         .dash-header p { color: var(--text-muted, #888); font-size: 0.85rem; margin-top: 0.2rem; }
 
-        /* 수익 배너 */
         .profit-banner { display: flex; align-items: center; gap: 1.5rem; background: white;
           border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem 1.5rem;
           margin-bottom: 1.2rem; flex-wrap: wrap; }
@@ -337,11 +329,9 @@ export default function DashboardPage() {
         .dash-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
         @media (max-width: 768px) { .dash-layout { grid-template-columns: 1fr; } }
 
-        /* 공통 카드 */
         :global(.card) { background: white; border: 1px solid #e5e7eb; border-radius: 14px; padding: 1.5rem; }
         :global(.card h2) { font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; }
 
-        /* 계산기 */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
         :global(.field) { display: flex; flex-direction: column; gap: 0.3rem; }
         :global(.field label) { font-size: 0.8rem; color: #666; font-weight: 500; }
@@ -353,7 +343,6 @@ export default function DashboardPage() {
           border-color: #f04141; box-shadow: 0 0 0 2px rgba(240,65,65,0.1);
         }
 
-        /* 결과 카드 */
         .result-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
         .result-card { background: #f9fafb; border-radius: 10px; padding: 0.8rem; }
         .result-card.main { grid-column: span 2; background: #fff5f5; }
@@ -361,7 +350,6 @@ export default function DashboardPage() {
         .result-card .value { display: block; font-size: 1.1rem; font-weight: 700; }
         .result-card.main .value { font-size: 1.4rem; }
 
-        /* 비용 분해 */
         .cost-breakdown { border-top: 1px solid #f0f0f0; padding-top: 1rem; margin-bottom: 1rem; }
         .cost-breakdown h3 { font-size: 0.85rem; color: #888; margin-bottom: 0.6rem; }
         .breakdown-row { display: flex; justify-content: space-between; font-size: 0.88rem;
@@ -371,7 +359,6 @@ export default function DashboardPage() {
         .breakdown-row.total { font-weight: 700; border-top: 1px solid #e5e7eb; border-bottom: none;
           padding-top: 0.5rem; margin-top: 0.3rem; }
 
-        /* 환불 모니터 */
         .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .monitor-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #888; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; }

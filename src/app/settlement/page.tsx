@@ -25,7 +25,7 @@ interface SettlementSummary {
 
 export default function SettlementPage() {
   const router = useRouter();
-  const { settings, isConfigured } = useSettingsStore();
+  const { isConfigured } = useSettingsStore();
   const [month, setMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -35,13 +35,12 @@ export default function SettlementPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchSettlement = useCallback(async () => {
-    if (!isConfigured()) return;
+    if (!isConfigured) return;
     setLoading(true);
     setError(null);
-    const { accessKey, secretKey, vendorId } = settings.credentials;
     try {
       const res = await fetch(
-        `/api/settlement?accessKey=${accessKey}&secretKey=${secretKey}&vendorId=${vendorId}&month=${month}`
+        `/api/settlement?month=${month}`
       );
       const json = await res.json();
       if (json.error) throw new Error(json.error);
@@ -77,7 +76,7 @@ export default function SettlementPage() {
     } finally {
       setLoading(false);
     }
-  }, [settings, isConfigured, month]);
+  }, [isConfigured, month]);
 
   return (
     <div className="settlement-page">
@@ -91,7 +90,7 @@ export default function SettlementPage() {
         </div>
       </header>
 
-      {!isConfigured() && (
+      {!isConfigured && (
         <div className="alert">⚠️ API 키를 먼저 설정하세요. <a href="/settings">설정 바로가기</a></div>
       )}
 
@@ -102,7 +101,7 @@ export default function SettlementPage() {
           value={month}
           onChange={(e) => setMonth(e.target.value)}
         />
-        <button className="fetch-btn" onClick={fetchSettlement} disabled={loading || !isConfigured()}>
+        <button className="fetch-btn" onClick={fetchSettlement} disabled={loading || !isConfigured}>
           {loading ? '조회 중...' : '조회하기'}
         </button>
       </div>
