@@ -39,9 +39,11 @@ export default function SettingsPage() {
     if (!accessKey || !secretKey || !vendorId) { setKeyError('세 항목을 모두 입력하세요.'); return; }
     setKeyStatus('saving'); setKeyError('');
     try {
-      const res = await fetch('/api/auth', { method: 'POST',
+      const res = await fetch('/api/auth', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessKey, secretKey, vendorId }) });
+        body: JSON.stringify({ accessKey, secretKey, vendorId })
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setKeyStatus('ok'); setConfigured(true);
@@ -127,7 +129,7 @@ export default function SettingsPage() {
         <div className="chip-group">
           {(['SELLER', 'ROCKET_GROWTH', 'ROCKET'] as const).map((v) => (
             <button key={v} className={`chip ${form.shippingType === v ? 'active' : ''}`}
-              onClick={() => setForm({...form, shippingType: v})}>
+              onClick={() => setForm({ ...form, shippingType: v })}>
               {v === 'SELLER' ? '판매자 배송' : v === 'ROCKET_GROWTH' ? '로켓그로스' : '로켓배송 (위탁)'}
             </button>
           ))}
@@ -137,7 +139,7 @@ export default function SettingsPage() {
             <label>건당 배송비</label>
             <div className="input-unit">
               <input type="number" value={form.sellerShippingCost}
-                onChange={e => setForm({...form, sellerShippingCost: Number(e.target.value)})} />
+                onChange={e => setForm({ ...form, sellerShippingCost: Number(e.target.value) })} />
               <span>원</span>
             </div>
           </div>
@@ -147,7 +149,7 @@ export default function SettingsPage() {
             <label>평균 무게</label>
             <div className="input-unit">
               <input type="number" step="0.1" value={form.rocketGrowthWeight}
-                onChange={e => setForm({...form, rocketGrowthWeight: Number(e.target.value)})} />
+                onChange={e => setForm({ ...form, rocketGrowthWeight: Number(e.target.value) })} />
               <span>kg</span>
             </div>
           </div>
@@ -158,7 +160,7 @@ export default function SettingsPage() {
         <div className="chip-group">
           {(['ROAS', 'FIXED'] as const).map((v) => (
             <button key={v} className={`chip ${form.adCostType === v ? 'active' : ''}`}
-              onClick={() => setForm({...form, adCostType: v})}>
+              onClick={() => setForm({ ...form, adCostType: v })}>
               {v === 'ROAS' ? 'ROAS 입력' : '건당 직접 입력'}
             </button>
           ))}
@@ -166,15 +168,15 @@ export default function SettingsPage() {
         <div className="field-row mt">
           {form.adCostType === 'ROAS' ? (
             <><label>ROAS</label>
-            <input type="number" value={form.adRoas}
-              onChange={e => setForm({...form, adRoas: Number(e.target.value)})} /></>
+              <input type="number" value={form.adRoas}
+                onChange={e => setForm({ ...form, adRoas: Number(e.target.value) })} /></>
           ) : (
             <><label>건당 광고비</label>
-            <div className="input-unit">
-              <input type="number" value={form.adFixedCost}
-                onChange={e => setForm({...form, adFixedCost: Number(e.target.value)})} />
-              <span>원</span>
-            </div></>
+              <div className="input-unit">
+                <input type="number" value={form.adFixedCost}
+                  onChange={e => setForm({ ...form, adFixedCost: Number(e.target.value) })} />
+                <span>원</span>
+              </div></>
           )}
         </div>
       </Section>
@@ -183,7 +185,7 @@ export default function SettingsPage() {
         <div className="chip-group">
           {(['GENERAL', 'SIMPLIFIED'] as const).map((v) => (
             <button key={v} className={`chip ${form.taxType === v ? 'active' : ''}`}
-              onClick={() => setForm({...form, taxType: v})}>
+              onClick={() => setForm({ ...form, taxType: v })}>
               {v === 'GENERAL' ? '일반과세자' : '간이과세자'}
             </button>
           ))}
@@ -195,7 +197,7 @@ export default function SettingsPage() {
           <label>갱신 주기</label>
           <div className="input-unit">
             <input type="number" min={1} max={60} value={form.pollIntervalMinutes}
-              onChange={e => setForm({...form, pollIntervalMinutes: Number(e.target.value)})} />
+              onChange={e => setForm({ ...form, pollIntervalMinutes: Number(e.target.value) })} />
             <span>분</span>
           </div>
         </div>
@@ -212,9 +214,10 @@ export default function SettingsPage() {
         .page-sub { font-size: 0.82rem; color: var(--text-muted); }
 
         .section { background: var(--surface); border: 1px solid var(--border);
-          border-radius: 14px; padding: 1.4rem; margin-bottom: 1rem; }
-        .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
-          text-transform: uppercase; color: var(--text-faint); margin-bottom: 1.1rem; }
+          border-radius: 14px; padding: 1.4rem; margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.2rem;
+          padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
 
         .guide { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
         .guide-steps { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.8rem; }
