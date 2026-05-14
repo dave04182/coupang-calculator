@@ -19,15 +19,15 @@ function SingleCalculator() {
   const commissionRate = customRate ?? (CATEGORY_FEES.find(c => c.id === categoryId)?.rate ?? 11);
   const result: ProfitResult | null = sellingPrice > 0
     ? calculateProfit(sellingPrice, purchasePrice, packagingCost, commissionRate, {
-        ...settings,
-        credentials: { accessKey: '', secretKey: '', vendorId: '' },
-      })
+      ...settings,
+      credentials: { accessKey: '', secretKey: '', vendorId: '' },
+    })
     : null;
 
   const marginColor = !result ? 'var(--text-muted)'
     : result.marginRate >= 20 ? 'var(--accent)'
-    : result.marginRate >= 10 ? 'var(--yellow)'
-    : 'var(--red)';
+      : result.marginRate >= 10 ? 'var(--yellow)'
+        : 'var(--red)';
 
   const pieData = result ? [
     { name: '원가', value: result.productCost, color: '#6366f1' },
@@ -119,8 +119,8 @@ function SingleCalculator() {
                 <span className="row-label">{row.label}</span>
                 <span className={`row-value ${row.type}`}>
                   {row.type === 'minus' ? `-${formatWon(row.value)}` :
-                   row.type === 'plus' ? `+${formatWon(row.value)}` :
-                   formatWon(row.value)}
+                    row.type === 'plus' ? `+${formatWon(row.value)}` :
+                      formatWon(row.value)}
                 </span>
               </div>
             ))}
@@ -136,20 +136,29 @@ function SingleCalculator() {
               <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={pieData} cx="50%" cy="50%" outerRadius={70} innerRadius={30}
-                    dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}>
+                    dataKey="value" label={false} labelLine={false}>
                     {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
                   <Tooltip formatter={(v: number) => formatWon(v)}
                     contentStyle={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
+              <div className="pie-legend">
+                {pieData.map((d, i) => (
+                  <div key={i} className="legend-item">
+                    <span className="legend-dot" style={{ background: d.color }} />
+                    <span className="legend-name">{d.name}</span>
+                    <span className="legend-pct">{((d.value / pieData.reduce((s, x) => s + x.value, 0)) * 100).toFixed(0)}%</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
       ) : (
         <div className="empty-state">판매가를 입력하면 순수익이 계산됩니다</div>
-      )}
+      )
+      }
 
       <style jsx>{`
         .calc-card { background: var(--surface); border: 1px solid var(--border);
@@ -166,6 +175,12 @@ function SingleCalculator() {
           font-size: 0.75rem; color: var(--text-faint); pointer-events: none; }
         .input-group select { padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.88rem; width: 100%; }
 
+        .pie-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.5rem; }
+        .legend-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .legend-name { color: var(--text-muted); }
+        .legend-pct { color: var(--text); font-weight: 700; }
+        
         .result-area { display: flex; flex-direction: column; gap: 1.2rem; }
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
         .kpi { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
@@ -194,7 +209,7 @@ function SingleCalculator() {
         .empty-state { padding: 2rem; text-align: center; color: var(--text-faint); font-size: 0.85rem;
           border: 1px dashed var(--border); border-radius: 10px; }
       `}</style>
-    </div>
+    </div >
   );
 }
 
@@ -230,10 +245,12 @@ function ReturnMonitor() {
         setNotification(`🔔 새 환불 ${newReturns}건 감지`);
         setTimeout(() => setNotification(null), 5000);
       }
-      setSummary({ totalRevenue, totalRefunds, netRevenue: totalRevenue - totalRefunds,
+      setSummary({
+        totalRevenue, totalRefunds, netRevenue: totalRevenue - totalRefunds,
         totalOrders, totalReturnCount, returnRate: Math.round(returnRate * 10) / 10,
         totalNetProfit: 0, averageMarginRate: 0,
-        lastUpdated: new Date().toLocaleString('ko-KR'), newReturnsDetected: newReturns });
+        lastUpdated: new Date().toLocaleString('ko-KR'), newReturnsDetected: newReturns
+      });
       setLastPolledAt(new Date().toLocaleTimeString('ko-KR'));
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
