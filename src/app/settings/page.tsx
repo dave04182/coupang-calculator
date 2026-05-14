@@ -69,7 +69,10 @@ export default function SettingsPage() {
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="section">
-      <div className="section-title">{title}</div>
+      <div className="section-title">
+        <span className="section-bar" />
+        {title}
+      </div>
       {children}
     </div>
   );
@@ -168,15 +171,15 @@ export default function SettingsPage() {
         <div className="field-row mt">
           {form.adCostType === 'ROAS' ? (
             <><label>ROAS</label>
-              <input type="number" value={form.adRoas}
-                onChange={e => setForm({ ...form, adRoas: Number(e.target.value) })} /></>
+            <input type="number" value={form.adRoas}
+              onChange={e => setForm({ ...form, adRoas: Number(e.target.value) })} /></>
           ) : (
             <><label>건당 광고비</label>
-              <div className="input-unit">
-                <input type="number" value={form.adFixedCost}
-                  onChange={e => setForm({ ...form, adFixedCost: Number(e.target.value) })} />
-                <span>원</span>
-              </div></>
+            <div className="input-unit">
+              <input type="number" value={form.adFixedCost}
+                onChange={e => setForm({ ...form, adFixedCost: Number(e.target.value) })} />
+              <span>원</span>
+            </div></>
           )}
         </div>
       </Section>
@@ -214,13 +217,15 @@ export default function SettingsPage() {
         .page-sub { font-size: 0.82rem; color: var(--text-muted); }
 
         .section { background: var(--surface); border: 1px solid var(--border);
-          border-radius: 14px; padding: 1.4rem; margin-bottom: 1.5rem; }
-        .section-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
-          text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.2rem;
-          padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+          border-radius: 14px; padding: 1.6rem; margin-bottom: 1.2rem; }
+        .section-title { display: flex; align-items: center; gap: 0.5rem;
+          font-size: 0.95rem; font-weight: 700; color: var(--text);
+          margin-bottom: 1.4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .section-bar { display: inline-block; width: 3px; height: 16px;
+          background: var(--accent); border-radius: 2px; flex-shrink: 0; }
 
-        .guide { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
-        .guide-steps { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.8rem; }
+        .guide { background: var(--bg2); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem; }
+        .guide-steps { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.8rem; }
         .step { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.84rem; color: var(--text-muted); }
         .step-num { width: 18px; height: 18px; border-radius: 50%; background: var(--border2);
           color: var(--text-faint); font-size: 0.7rem; font-weight: 700;
@@ -236,12 +241,12 @@ export default function SettingsPage() {
         .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
           box-shadow: 0 0 6px var(--accent); }
 
-        .key-fields { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1rem; }
+        .key-fields { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.2rem; }
         .field-row { display: flex; align-items: center; gap: 1rem; }
         .field-row label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600;
           min-width: 90px; flex-shrink: 0; }
         .field-row input { flex: 1; padding: 0.55rem 0.8rem; border-radius: 8px; font-size: 0.9rem; }
-        .field-row.mt { margin-top: 0.8rem; }
+        .field-row.mt { margin-top: 1.2rem; }
         .input-unit { display: flex; align-items: center; gap: 0.4rem; flex: 1; }
         .input-unit input { flex: 1; padding: 0.55rem 0.8rem; border-radius: 8px; font-size: 0.9rem; }
         .input-unit span { font-size: 0.8rem; color: var(--text-faint); white-space: nowrap; }
@@ -261,7 +266,7 @@ export default function SettingsPage() {
         .disconnect-btn:hover { border-color: var(--red); color: var(--red); }
 
         .chip-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .chip { padding: 0.4rem 0.9rem; border: 1px solid var(--border2); border-radius: 20px;
+        .chip { padding: 0.45rem 1rem; border: 1px solid var(--border2); border-radius: 20px;
           background: transparent; font-size: 0.84rem; cursor: pointer;
           color: var(--text-muted); transition: all 0.15s; }
         .chip:hover { border-color: var(--accent); color: var(--accent); }
