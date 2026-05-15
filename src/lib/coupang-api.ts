@@ -18,11 +18,14 @@ function generateHmacSignature(
   query: string,
   secretKey: string
 ): { authorization: string; datetime: string } {
-  const datetime = new Date()
-    .toISOString()
-    .replace(/[-:]/g, '')
-    .replace(/\.\d{3}Z/, '')
-    .slice(0, 15) + 'Z';
+  const now = new Date();
+  const yy = String(now.getUTCFullYear()).slice(2); // 2자리 연도
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const hh = String(now.getUTCHours()).padStart(2, '0');
+  const min = String(now.getUTCMinutes()).padStart(2, '0');
+  const ss = String(now.getUTCSeconds()).padStart(2, '0');
+  const datetime = `${yy}${mm}${dd}T${hh}${min}${ss}Z`;
 
   // query string을 알파벳 순으로 정렬
   const sortedQuery = query
