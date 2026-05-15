@@ -1,8 +1,5 @@
 import crypto from 'crypto';
 
-// ─── 쿠팡 Open API HMAC 인증 ─────────────────────────────────
-// 공식 문서: https://developers.coupangcorp.com/hc/ko
-
 interface CoupangRequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   path: string;
@@ -19,7 +16,7 @@ function generateHmacSignature(
   secretKey: string
 ): { authorization: string; datetime: string } {
   const now = new Date();
-  const yy = String(now.getUTCFullYear()).slice(2); // 2자리 연도
+  const yy = String(now.getUTCFullYear()).slice(2);
   const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(now.getUTCDate()).padStart(2, '0');
   const hh = String(now.getUTCHours()).padStart(2, '0');
@@ -27,12 +24,9 @@ function generateHmacSignature(
   const ss = String(now.getUTCSeconds()).padStart(2, '0');
   const datetime = `${yy}${mm}${dd}T${hh}${min}${ss}Z`;
 
-  // query string을 알파벳 순으로 정렬
-  const sortedQuery = query
-    ? query.split('&').sort().join('&')
-    : '';
+  // 쿼리 정렬 없이 그대로 붙임 (공식 문서 방식)
+  const message = datetime + method + path + (query || '');
 
-  const message = datetime + method + path + (sortedQuery ? sortedQuery : '');
   const hmac = crypto
     .createHmac('sha256', secretKey)
     .update(message)
@@ -51,18 +45,18 @@ export async function coupangRequest<T = unknown>({
 }: CoupangRequestOptions): Promise<T> {
   const BASE_URL = 'https://api-gateway.coupang.com';
 
+  // 쿼리스트링 생성 — 인코딩 없이 그대로
   const queryString = Object.keys(query).length
-    ? '?' + new URLSearchParams(query).toString()
+    ? '?' + Object.keys(query).map(k => `${k}=${query[k]}`).join('&')
     : '';
 
-  const sortedQueryForSignature = Object.keys(query).length
-    ? Object.keys(query).sort().map(k => `${k}=${query[k]}`).join('&')
-    : '';
+  // 서명에도 동일한 쿼리스트링 사용 (? 제외)
+  const queryForSignature = queryString.slice(1); // '?' 제거
 
   const { authorization, datetime } = generateHmacSignature(
     method,
     path,
-    sortedQueryForSignature,
+    queryForSignature,
     secretKey
   );
 
@@ -96,11 +90,7 @@ export async function fetchOrders(
   return coupangRequest({
     method: 'GET',
     path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/ordersheets`,
-    query: {
-      createdAtFrom,
-      createdAtTo,
-      status: 'ACCEPT',
-    },
+    query: { createdAtFrom, createdAtTo, status: 'ACCEPT' },
     accessKey,
     secretKey,
   });
@@ -117,10 +107,7 @@ export async function fetchReturns(
   return coupangRequest({
     method: 'GET',
     path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/returnRequests`,
-    query: {
-      createdAtFrom,
-      createdAtTo,
-    },
+    query: { createdAtFrom, createdAtTo },
     accessKey,
     secretKey,
   });
@@ -146,14 +133,13 @@ export async function fetchProducts(
   });
 }
 
-// ─── 정산 내역 조회 ───────────────────────────────────────────
+// ─── 정산(매출내역) 조회 ─────────────────────────────────────
 export async function fetchSettlement(
   accessKey: string,
   secretKey: string,
   vendorId: string,
   month: string  // YYYY-MM
 ) {
-  // month를 날짜 범위로 변환
   const from = `${month}-01`;
   const lastDay = new Date(Number(month.split('-')[0]), Number(month.split('-')[1]), 0).getDate();
   const to = `${month}-${String(lastDay).padStart(2, '0')}`;
