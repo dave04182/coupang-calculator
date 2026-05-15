@@ -8,19 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '모든 필드를 입력하세요.' }, { status: 400 });
   }
 
-  // 실제 쿠팡 API 호출로 키 유효성 검증
-  try {
-    const { coupangRequest } = await import('@/lib/coupang-api');
-    await coupangRequest({
-      method: 'GET',
-      path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/products`,
-      query: { maxPerPage: '1' },
-      accessKey,
-      secretKey,
-    });
-  } catch {
-    return NextResponse.json({ error: 'API 키가 유효하지 않습니다. Vendor ID, Access Key, Secret Key를 확인하세요.' }, { status: 401 });
-  }
+
 
   const savedAt = new Date().toISOString();
   const res = NextResponse.json({ ok: true, savedAt });
