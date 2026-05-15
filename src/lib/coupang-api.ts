@@ -24,7 +24,12 @@ function generateHmacSignature(
     .replace(/\.\d{3}Z/, '')
     .slice(0, 15) + 'Z';
 
-  const message = datetime + method + path + (query ? query : '');
+  // query string을 알파벳 순으로 정렬
+  const sortedQuery = query
+    ? query.split('&').sort().join('&')
+    : '';
+
+  const message = datetime + method + path + (sortedQuery ? sortedQuery : '');
   const hmac = crypto
     .createHmac('sha256', secretKey)
     .update(message)
@@ -47,10 +52,14 @@ export async function coupangRequest<T = unknown>({
     ? '?' + new URLSearchParams(query).toString()
     : '';
 
+  const sortedQueryForSignature = Object.keys(query).length
+    ? Object.keys(query).sort().map(k => `${k}=${query[k]}`).join('&')
+    : '';
+
   const { authorization, datetime } = generateHmacSignature(
     method,
     path,
-    new URLSearchParams(query).toString(),
+    sortedQueryForSignature,
     secretKey
   );
 
