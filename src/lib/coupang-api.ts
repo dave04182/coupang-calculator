@@ -143,7 +143,7 @@ export async function fetchSettlement(
 ) {
   return coupangRequest({
     method: 'GET',
-    path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/settlements`,
+    path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/billing/settlements/current-month`,
     query: { month },
     accessKey,
     secretKey,
