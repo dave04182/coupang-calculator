@@ -141,10 +141,19 @@ export async function fetchSettlement(
   vendorId: string,
   month: string  // YYYY-MM
 ) {
+  // month를 날짜 범위로 변환
+  const from = `${month}-01`;
+  const lastDay = new Date(Number(month.split('-')[0]), Number(month.split('-')[1]), 0).getDate();
+  const to = `${month}-${String(lastDay).padStart(2, '0')}`;
+
   return coupangRequest({
     method: 'GET',
-    path: `/v2/providers/openapi/apis/api/v4/vendors/${vendorId}/billing/settlements/current-month`,
-    query: { month },
+    path: `/v2/providers/openapi/apis/api/v1/revenue-history`,
+    query: {
+      vendorId,
+      recognitionDateFrom: from,
+      recognitionDateTo: to,
+    },
     accessKey,
     secretKey,
   });
