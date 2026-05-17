@@ -142,7 +142,13 @@ export async function fetchSettlement(
 ) {
   const from = `${month}-01`;
   const lastDay = new Date(Number(month.split('-')[0]), Number(month.split('-')[1]), 0).getDate();
-  const to = `${month}-${String(lastDay).padStart(2, '0')}`;
+  const lastDayStr = `${month}-${String(lastDay).padStart(2, '0')}`;
+
+  // to는 어제와 해당 월 말일 중 더 이른 날짜
+  const yesterday = new Date();
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const to = lastDayStr < yesterdayStr ? lastDayStr : yesterdayStr;
 
   return coupangRequest({
     method: 'GET',
@@ -151,8 +157,8 @@ export async function fetchSettlement(
       vendorId,
       recognitionDateFrom: from,
       recognitionDateTo: to,
-      token: '',        // ← 이거 추가!
-      maxPerPage: '50', // ← 이거 추가!
+      token: '',
+      maxPerPage: '50',
     },
     accessKey,
     secretKey,
