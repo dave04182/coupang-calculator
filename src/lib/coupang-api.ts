@@ -151,6 +151,8 @@ export async function fetchSettlement(
       vendorId,
       recognitionDateFrom: from,
       recognitionDateTo: to,
+      token: '',        // ← 이거 추가!
+      maxPerPage: '50', // ← 이거 추가!
     },
     accessKey,
     secretKey,
