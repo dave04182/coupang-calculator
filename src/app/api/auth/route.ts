@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   // httpOnly 쿠키로 저장 — JS에서 접근 불가, 서버에서만 읽힘
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false,
     sameSite: 'lax' as const,
     maxAge: 60 * 60 * 24 * 180, // 180일 (쿠팡 API 키 유효기간과 동일)
     path: '/',
