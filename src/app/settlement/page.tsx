@@ -39,26 +39,33 @@ export default function SettlementPage() {
     setLoading(true);
     setError(null);
     try {
+      // 💡 [수정] 캐시를 강제로 무시하고 항상 최신 데이터를 받아오도록 수정
       const res = await fetch(
-        `/api/settlement?month=${month}`
+        `/api/settlement?month=${month}&t=${Date.now()}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        }
       );
       const json = await res.json();
       if (json.error) throw new Error(json.error);
 
-      const rows: SettlementRow[] = (json?.data ?? []).map((item: {
-        orderId?: string;
-        orderDate?: string;
-        productName?: string;
-        sellingPrice?: number;
-        commissionFee?: number;
-        shippingFee?: number;
-        settlementAmount?: number;
-      }) => ({
+      // 💡 [핵심 포인트] 브라우저 개발자 도구(F12) 콘솔에서 실제 어떤 모양으로 데이터가 오는지 확인!
+      console.log('🔥 쿠팡 API 진짜 응답:', json);
+
+      // json 자체가 배열인지, json.data 안에 있는지 양쪽 모두 대응
+      const rawData = Array.isArray(json) ? json : (json?.data ?? []);
+
+      // 타입 단언(any)을 임시로 주어 맵핑 중 발생하는 타입 에러 방지
+      const rows: SettlementRow[] = rawData.map((item: any) => ({
         orderId: item.orderId ?? '-',
-        orderDate: item.orderDate ?? '-',
+        orderDate: item.orderDate ?? item.recognitionDate ?? '-', // recognitionDate 대응 추가
         productName: item.productName ?? '-',
-        sellingPrice: item.sellingPrice ?? 0,
-        coupangFee: item.commissionFee ?? 0,
+        sellingPrice: item.sellingPrice ?? item.revenueAmount ?? 0, // revenueAmount 대응 추가
+        // 주의: API 응답 필드명이 commissionFee인지 coupangFee인지 꼭 확인하세요!
+        coupangFee: item.commissionFee ?? item.coupangFee ?? 0,
         shippingFee: item.shippingFee ?? 0,
         settlementAmount: item.settlementAmount ?? 0,
       }));
@@ -136,9 +143,9 @@ export default function SettlementPage() {
               <thead>
                 <tr>
                   <th>주문번호</th>
-                  <th>주문일</th>
+                  <th>주문일(매출인식일)</th>
                   <th>상품명</th>
-                  <th>판매가</th>
+                  <th>판매가(매출액)</th>
                   <th>쿠팡 수수료</th>
                   <th>배송비</th>
                   <th>정산액</th>
@@ -198,6 +205,7 @@ export default function SettlementPage() {
         .s-card .value.red { color: #dc2626; }
         .table-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+        /* 테이블 헤더 약간 수정 (구분하기 쉽게) */
         thead { background: #f9fafb; }
         th { padding: 0.7rem 1rem; text-align: left; font-weight: 600; color: #555;
           font-size: 0.8rem; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
